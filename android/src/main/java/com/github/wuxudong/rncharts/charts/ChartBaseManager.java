@@ -19,7 +19,6 @@ import com.github.mikephil.charting.components.LimitLine;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.XAxis.XAxisPosition;
 import com.github.mikephil.charting.data.Entry;
-import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
 import com.github.mikephil.charting.formatter.LargeValueFormatter;
 import com.github.mikephil.charting.formatter.PercentFormatter;
 import com.github.mikephil.charting.highlight.Highlight;
@@ -28,6 +27,7 @@ import com.github.wuxudong.rncharts.markers.RNRectangleMarkerView;
 import com.github.wuxudong.rncharts.utils.BridgeUtils;
 import com.github.wuxudong.rncharts.utils.EasingFunctionHelper;
 import com.github.wuxudong.rncharts.utils.TypefaceUtils;
+import com.github.wuxudong.rncharts.charts.IndexAxisMapValueFormatter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -448,8 +448,13 @@ public abstract class ChartBaseManager<T extends Chart, U extends Entry> extends
             } else {
                 axis.setValueFormatter(new CustomFormatter(valueFormatter));
             }
-        } else if (BridgeUtils.validate(propMap, ReadableType.Array, "valueFormatter")) {
-            axis.setValueFormatter(new IndexAxisValueFormatter(BridgeUtils.convertToStringArray(propMap.getArray("valueFormatter"))));
+        } else if (
+                BridgeUtils.validate(propMap, ReadableType.Array, "valueFormatter") &&
+                        BridgeUtils.validate(propMap, ReadableType.Array, "indexFormatter")) {
+            axis.setValueFormatter(new IndexAxisMapValueFormatter(
+                    BridgeUtils.convertToStringArray(propMap.getArray("valueFormatter")),
+                    BridgeUtils.convertToIntArray(propMap.getArray("indexFormatter")))
+            );
         }
 
         if (BridgeUtils.validate(propMap, ReadableType.Boolean, "centerAxisLabels")) {
