@@ -11,6 +11,10 @@ import com.github.mikephil.charting.charts.BarLineChartBase;
 import com.github.mikephil.charting.charts.Chart;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.formatter.DefaultValueFormatter;
+import com.github.mikephil.charting.formatter.LargeValueFormatter;
+import com.github.mikephil.charting.formatter.PercentFormatter;
+import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.github.mikephil.charting.jobs.ZoomJob;
 import com.github.mikephil.charting.listener.BarLineChartTouchListener;
 import com.github.mikephil.charting.listener.OnChartGestureListener;
@@ -23,6 +27,7 @@ import com.github.wuxudong.rncharts.utils.BridgeUtils;
 import java.lang.reflect.Field;
 import java.util.Map;
 import java.util.WeakHashMap;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nullable;
 
@@ -65,6 +70,44 @@ public abstract class BarLineChartBaseManager<T extends BarLineChartBase, U exte
             YAxis rightYAxis = barLineChart.getAxisRight();
             setCommonAxisConfig(chart, rightYAxis, propMap.getMap("right"));
             setYAxisConfig(rightYAxis, propMap.getMap("right"));
+        }
+    }
+
+    @ReactProp(name="doubleXAxisLabel")
+    public void setXAxisRender(BarLineChartBase chart, ReadableMap propMap){
+        if (BridgeUtils.validate(propMap, ReadableType.Boolean, "enabled")){
+            ValueFormatter topValueFormatter = new DefaultValueFormatter(1);
+            if (BridgeUtils.validate(propMap, ReadableType.String, "valueFormatter")) {
+                String valueFormatter = propMap.getString("valueFormatter");
+                if ("largeValue".equals(valueFormatter)) {
+                    topValueFormatter= new LargeValueFormatter();
+                } else if ("percent".equals(valueFormatter)) {
+                    topValueFormatter= new PercentFormatter();
+                } else if ("date".equals(valueFormatter)) {
+                    String valueFormatterPattern = propMap.getString("valueFormatterPattern");
+
+                    long since = 0;
+                    if (BridgeUtils.validate(propMap, ReadableType.Number, "since")) {
+                        since = (long) propMap.getDouble("since");
+                    }
+
+                    TimeUnit timeUnit = TimeUnit.MILLISECONDS;
+
+                    if (BridgeUtils.validate(propMap, ReadableType.String, "timeUnit")) {
+                        timeUnit = TimeUnit.valueOf(propMap.getString("timeUnit").toUpperCase());
+                    }
+                    topValueFormatter= new DateFormatter(valueFormatterPattern, since, timeUnit);
+                } else {
+                    topValueFormatter= new CustomFormatter(valueFormatter);
+                }
+            } else if (
+                    BridgeUtils.validate(propMap, ReadableType.Array, "valueFormatter") &&
+                            BridgeUtils.validate(propMap, ReadableType.Array, "indexFormatter")) {
+                topValueFormatter=new IndexAxisMapValueFormatter(
+                        BridgeUtils.convertToStringArray(propMap.getArray("valueFormatter")),
+                        BridgeUtils.convertToIntArray(propMap.getArray("indexFormatter")));
+            }
+            chart.setXAxisRenderer(new DoubleXLabelAxisRenderer(chart.getViewPortHandler(), chart.getXAxis(),chart.getTransformer(YAxis.AxisDependency.LEFT),topValueFormatter));
         }
     }
 
