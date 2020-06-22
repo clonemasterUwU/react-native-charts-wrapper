@@ -398,9 +398,9 @@ open class RNChartViewBase: UIView, ChartViewDelegate {
         // formatting
         // TODO: other formatting options
         let valueFormatter = config["valueFormatter"];
-        if valueFormatter.array != nil {
-            axis.valueFormatter = IndexAxisValueFormatter(values: valueFormatter.arrayValue.map({ $0.stringValue }))
-        } else if valueFormatter.string != nil {
+        if valueFormatter.array != nil && indexFormatter.array != nil {
+            axis.valueFormatter = IndexAxisMapValueFormatter(valueFormatter.arrayValue.map({ $0.stringValue }),indexFormatter.arrayValue.map({ $0.numberValue.intValue }))
+            } else if valueFormatter.string != nil {
             if "largeValue" == valueFormatter.stringValue {
                 axis.valueFormatter = LargeValueFormatter();
             } else if "percent" == valueFormatter.stringValue {
