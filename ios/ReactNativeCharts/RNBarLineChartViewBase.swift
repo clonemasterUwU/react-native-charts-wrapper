@@ -34,7 +34,39 @@ class RNBarLineChartViewBase: RNYAxisChartViewBase {
             setYAxisConfig(rightAxis, config: json["right"]);
         }
     }
-
+    
+    func setDoubleXAxisLabel(_ config:NSDictionary){
+        let json = BridgeUtils.toJson(config)
+        if json["enabled"].bool != nil {
+            var topValueFormatter:IAxisValueFormatter?
+            let valueFormatter = json["valueFormatter"]
+            let indexFormatter = json["indexFormatter"]
+            if valueFormatter.array != nil && indexFormatter.array != nil {
+                topValueFormatter = IndexAxisMapValueFormatter(valueFormatter.arrayValue.map({ $0.stringValue }),indexFormatter.arrayValue.map({ $0.numberValue.intValue }))
+            } else if valueFormatter.string != nil {
+                if "largeValue" == valueFormatter.stringValue {
+                    topValueFormatter = LargeValueFormatter();
+                } else if "percent" == valueFormatter.stringValue {
+                    let percentFormatter = NumberFormatter()
+                    percentFormatter.numberStyle = .percent
+                    
+                    topValueFormatter = DefaultAxisValueFormatter(formatter: percentFormatter);
+                } else if "date" == valueFormatter.stringValue {
+                  let valueFormatterPattern = json["valueFormatterPattern"].stringValue;
+                  let since = json["since"].double != nil ? json["since"].doubleValue : 0
+                  let timeUnit = json["timeUnit"].string != nil ? json["timeUnit"].stringValue : "MILLISECONDS"
+                  topValueFormatter = CustomChartDateFormatter(pattern: valueFormatterPattern, since: since, timeUnit: timeUnit);
+                } else {
+                  let customFormatter = NumberFormatter()
+                  customFormatter.positiveFormat = valueFormatter.stringValue
+                  customFormatter.negativeFormat = valueFormatter.stringValue
+                  
+                  topValueFormatter = DefaultAxisValueFormatter(formatter: customFormatter);
+              }
+            }
+            barLineChart.xAxisRenderer=DoubleXLabelAxisRenderer(viewPortHandler: barLineChart.viewPortHandler, xAxis: barLineChart.xAxis, transformer: barLineChart.getTransformer(forAxis: .left ), topValueFormatter: topValueFormatter ?? DefaultAxisValueFormatter())
+        }
+    }
 
     func setMaxHighlightDistance(_  maxHighlightDistance: CGFloat) {
         barLineChart.maxHighlightDistance = maxHighlightDistance;

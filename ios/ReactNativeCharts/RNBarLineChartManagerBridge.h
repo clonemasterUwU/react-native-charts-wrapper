@@ -9,6 +9,7 @@
 EXPORT_Y_AXIS_CHART_BASE_PROPERTIES \
 RCT_EXPORT_VIEW_PROPERTY(drawGridBackground, BOOL) \
 RCT_EXPORT_VIEW_PROPERTY(maxHighlightDistance, CGFloat) \
+RCT_EXPORT_VIEW_PROPERTY(doubleXAxisLabel, NSDictionary)\
 RCT_EXPORT_VIEW_PROPERTY(gridBackgroundColor, NSInteger) \
 RCT_EXPORT_VIEW_PROPERTY(drawBorders, BOOL) \
 RCT_EXPORT_VIEW_PROPERTY(borderColor, NSInteger) \
