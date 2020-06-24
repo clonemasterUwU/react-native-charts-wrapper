@@ -7,7 +7,7 @@
 
 
 import Foundation
-
+import Charts
 @objc(IndexAxisMapValueFormatter)
 open class IndexAxisMapValueFormatter: NSObject, IAxisValueFormatter
 {

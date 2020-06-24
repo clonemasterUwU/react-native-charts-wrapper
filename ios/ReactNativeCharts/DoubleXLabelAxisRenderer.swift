@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Charts
 @objc(DoubleXLabelAxisRenderer)
 open class DoubleXLabelAxisRenderer: XAxisRenderer{
     var topValueFormatter: IAxisValueFormatter
@@ -43,7 +44,7 @@ open class DoubleXLabelAxisRenderer: XAxisRenderer{
             .foregroundColor: xAxis.labelTextColor,
             .paragraphStyle: paraStyle
         ]
-        let labelRotationAngleRadians = xAxis.labelRotationAngle.DEG2RAD
+        let labelRotationAngleRadians = xAxis.labelRotationAngle * .pi/180
         
         let centeringEnabled = xAxis.isCenterAxisLabelsEnabled
 
